@@ -3,9 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/button";
 import { Input, Label } from "@/components/input";
+import { Logo } from "@/components/logo";
 import { useAuth } from "./auth-provider";
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
@@ -25,7 +25,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       else await signUp(email, password);
       router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Authentication failed.");
+      setError(toPublicAuthError(err));
     } finally {
       setLoading(false);
     }
@@ -34,12 +34,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   return (
     <main className="grid min-h-screen bg-slate-50 lg:grid-cols-[1fr_0.85fr]">
       <section className="hidden bg-slate-950 p-10 text-white lg:flex lg:flex-col lg:justify-between">
-        <Link href="/" className="flex items-center gap-2 text-sm font-bold">
-          <span className="grid h-8 w-8 place-items-center rounded-md bg-blue-500">
-            <ShieldCheck size={18} />
-          </span>
-          AgentCheck
-        </Link>
+        <Logo textClassName="text-white" />
         <div>
           <h1 className="max-w-xl text-5xl font-semibold leading-tight">
             Launch AI support with a scored evidence trail.
@@ -52,25 +47,19 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       </section>
       <section className="flex items-center justify-center px-4 py-12">
         <form onSubmit={submit} className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <Link href="/" className="mb-8 flex items-center gap-2 text-sm font-bold lg:hidden">
-            <span className="grid h-8 w-8 place-items-center rounded-md bg-slate-950 text-white">
-              <ShieldCheck size={18} />
-            </span>
-            AgentCheck
-          </Link>
+          <Logo className="mb-8 lg:hidden" />
           <h2 className="text-2xl font-semibold">
             {mode === "login" ? "Log in" : "Create your account"}
           </h2>
           <p className="mt-2 text-sm text-slate-600">
             {mode === "login"
               ? "Continue to your audit dashboard."
-              : "Start with a secure Firebase account."}
+              : "Create a secure workspace for agent QA."}
           </p>
 
           {!configured ? (
             <div className="mt-6 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-900">
-              Firebase public env vars are not configured. Add them in Vercel and local
-              development before signing in.
+              Sign-in is not ready yet. Please come back once workspace setup is complete.
             </div>
           ) : null}
 
@@ -115,4 +104,14 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       </section>
     </main>
   );
+}
+
+function toPublicAuthError(error: unknown) {
+  const message = error instanceof Error ? error.message : "";
+  if (/password/i.test(message)) return "Check your email and password, then try again.";
+  if (/email/i.test(message)) return "Enter a valid work email address.";
+  if (/configured|environment|firebase/i.test(message)) {
+    return "Sign-in is not ready yet. Please try again later.";
+  }
+  return "Sign-in failed. Please try again.";
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, ArrowRight, FilePlus2, ShieldCheck } from "lucide-react";
+import { AlertTriangle, ArrowRight, FilePlus2, TrendingUp } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { ButtonLink } from "@/components/button";
 import { ScoreRing } from "@/components/score-ring";
@@ -77,10 +77,10 @@ function DashboardContent() {
           </div>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <div className="text-sm font-semibold text-slate-500">Billing gate</div>
+          <div className="text-sm font-semibold text-slate-500">Launch readiness</div>
           <div className="mt-3 flex items-center gap-3 text-sm text-slate-700">
-            <ShieldCheck size={18} className="text-blue-600" />
-            Runs require an active Polar subscription.
+            <TrendingUp size={18} className="text-blue-600" />
+            Audit runs unlock after your workspace plan is active.
           </div>
         </div>
       </div>

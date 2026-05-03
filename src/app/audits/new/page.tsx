@@ -261,8 +261,8 @@ function NewAuditContent() {
                 </dl>
               </div>
               <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
-                Runs are fully billing-gated. You need Firebase Admin env vars, an active Polar
-                subscription, Polar product IDs, and OpenAI configured before this can complete.
+                Audit runs require an active workspace plan and completed secure workspace setup.
+                If setup is incomplete, your draft will be saved and the run can be started later.
               </div>
               {error ? (
                 <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">

@@ -164,7 +164,7 @@ export async function getActiveSubscription(orgId: string) {
 export async function requireBillableOrg(orgId: string) {
   const subscription = await getActiveSubscription(orgId);
   if (!subscription) {
-    throw new Error("An active Polar subscription is required before running audits.");
+    throw new Error("Choose an active plan before running audits.");
   }
   return subscription;
 }

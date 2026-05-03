@@ -16,10 +16,10 @@ export function Protected({ children }: { children: React.ReactNode }) {
   if (!configured) {
     return (
       <div className="mx-auto flex min-h-screen max-w-xl flex-col justify-center px-6">
-        <h1 className="text-2xl font-semibold">Firebase is not configured</h1>
+        <h1 className="text-2xl font-semibold">Workspace setup is incomplete</h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Add the Firebase public env vars locally or in Vercel before using protected
-          app screens.
+          The secure sign-in service is not ready yet. Please try again after
+          the workspace has been configured.
         </p>
         <Link className="mt-6 text-sm font-semibold text-blue-700" href="/">
           Back to site

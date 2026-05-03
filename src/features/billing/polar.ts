@@ -3,22 +3,23 @@ import { getActiveSubscription, getOrCreateTenant, upsertSubscription } from "@/
 import type { Subscription } from "@/lib/types";
 
 const productEnv = {
-  starter: "POLAR_STARTER_PRODUCT_ID",
-  growth: "POLAR_GROWTH_PRODUCT_ID",
-  pro: "POLAR_PRO_PRODUCT_ID",
+  starter: ["BILLING_STARTER_PRODUCT_ID", "POLAR_STARTER_PRODUCT_ID"],
+  growth: ["BILLING_GROWTH_PRODUCT_ID", "POLAR_GROWTH_PRODUCT_ID"],
+  pro: ["BILLING_PRO_PRODUCT_ID", "POLAR_PRO_PRODUCT_ID"],
 } as const;
 
 export type PaidPlan = keyof typeof productEnv;
 
 export function getProductId(plan: PaidPlan) {
-  const value = process.env[productEnv[plan]];
-  if (!value) throw new Error(`${productEnv[plan]} is not configured.`);
+  const [primary, fallback] = productEnv[plan];
+  const value = process.env[primary] ?? process.env[fallback];
+  if (!value) throw new Error("Checkout is not available right now.");
   return value;
 }
 
 export async function createCheckoutUrl(uid: string, email: string | undefined, plan: PaidPlan) {
-  const accessToken = process.env.POLAR_ACCESS_TOKEN;
-  if (!accessToken) throw new Error("POLAR_ACCESS_TOKEN is not configured.");
+  const accessToken = process.env.BILLING_ACCESS_TOKEN ?? process.env.POLAR_ACCESS_TOKEN;
+  if (!accessToken) throw new Error("Checkout is not available right now.");
 
   const user = await getOrCreateTenant(uid, email);
   const existing = await getActiveSubscription(user.defaultOrgId);
@@ -43,18 +44,17 @@ export async function createCheckoutUrl(uid: string, email: string | undefined, 
   });
 
   if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Polar checkout failed: ${body}`);
+    throw new Error("Checkout is not available right now.");
   }
 
   const checkout = (await response.json()) as { url?: string };
-  if (!checkout.url) throw new Error("Polar did not return a checkout URL.");
+  if (!checkout.url) throw new Error("Checkout is not available right now.");
   return { alreadyActive: false, url: checkout.url };
 }
 
 export async function handlePolarWebhook(body: string, headers: Headers) {
-  const secret = process.env.POLAR_WEBHOOK_SECRET;
-  if (!secret) throw new Error("POLAR_WEBHOOK_SECRET is not configured.");
+  const secret = process.env.BILLING_WEBHOOK_SECRET ?? process.env.POLAR_WEBHOOK_SECRET;
+  if (!secret) throw new Error("Webhook handling is not available right now.");
 
   const event = validateEvent(
     body,
@@ -85,7 +85,7 @@ export async function handlePolarWebhook(body: string, headers: Headers) {
   const metadata = event.data.metadata ?? {};
   const orgId = metadata.orgId;
   const plan = (metadata.plan ?? "starter") as Subscription["plan"];
-  if (!orgId) throw new Error("Polar webhook is missing orgId metadata.");
+  if (!orgId) throw new Error("Webhook metadata is incomplete.");
 
   await upsertSubscription({
     id: event.data.subscription_id ?? event.data.subscriptionId ?? event.data.id,

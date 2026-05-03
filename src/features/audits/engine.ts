@@ -98,13 +98,14 @@ function deterministicCase(audit: Audit, suite: TestSuite, index: number) {
 }
 
 async function generateWithOpenAI(audit: Audit) {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY is not configured.");
+  const apiKey = process.env.AI_PROVIDER_API_KEY ?? process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("The audit engine is not configured yet.");
   }
 
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const client = new OpenAI({ apiKey });
   const response = await client.responses.create({
-    model: process.env.OPENAI_MODEL ?? "gpt-4.1-mini",
+    model: process.env.AUDIT_MODEL ?? process.env.OPENAI_MODEL ?? "gpt-4.1-mini",
     input: [
       {
         role: "system",
@@ -139,7 +140,7 @@ export async function runDemoAudit(audit: Audit): Promise<EngineOutput> {
   try {
     generated = await generateWithOpenAI(audit);
   } catch (error) {
-    if (!process.env.OPENAI_API_KEY) throw error;
+    if (!(process.env.AI_PROVIDER_API_KEY ?? process.env.OPENAI_API_KEY)) throw error;
     generated = {
       testCases: audit.selectedSuites.map((suite, index) =>
         deterministicCase(audit, suite, index),

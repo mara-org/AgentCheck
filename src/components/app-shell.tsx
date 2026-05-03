@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { ShieldCheck, LogOut, Plus } from "lucide-react";
+import { LogOut, Plus } from "lucide-react";
 import { useAuth } from "@/features/auth/auth-provider";
 import { Button, ButtonLink } from "./button";
+import { Logo } from "./logo";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
@@ -12,12 +12,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-          <Link className="flex items-center gap-2 text-sm font-bold" href="/dashboard">
-            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-950 text-white">
-              <ShieldCheck size={18} />
-            </span>
-            AgentCheck
-          </Link>
+          <Logo href="/dashboard" />
           <nav className="flex items-center gap-2">
             <ButtonLink href="/audits/new" className="hidden sm:inline-flex">
               <Plus size={16} />
